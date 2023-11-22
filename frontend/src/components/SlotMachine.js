@@ -8,20 +8,22 @@ const SlotMachine = () => {
   const [apostaRealizada, setApostaRealizada] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTemporizador((prev) => (prev > 0 ? prev - 1 : 60));
-
-      if (temporizador === 0) {
+  const interval = setInterval(() => {
+    setTemporizador((prev) => {
+      if (prev > 0) {
+        return prev - 1;
+      } else {
         handleVerificarPerdedor();
-        setTemporizador(60);
-        setApostaRealizada(false); // Reinicia o estado para a próxima rodada
+        setApostaRealizada(false);  
+        return 60;
       }
-    }, 1000);
+    });
+  }, 1000);
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, [temporizador]);
+  return () => {
+    clearInterval(interval);
+  };
+}, []);
 
   const handleAposta = async (cor) => {
     try {
