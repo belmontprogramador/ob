@@ -28,19 +28,24 @@ app.post('/apostar/:cor', async (req, res) => {
   }
 });
 
-// Rota para verificar o vencedor
-app.get('/menorNumeroApostas', async (req, res) => {
+app.get('/verificarPerdedor', async (req, res) => {
     try {
-      // Lógica para consultar o menor número de apostas nos últimos 60 segundos
-      const query = 'SELECT MIN(numero_apostas) AS menor_numero_apostas FROM apostas WHERE data_insercao >= NOW() - INTERVAL \'60 seconds\'';
+      // Lógica para verificar o vencedor com o menor número de apostas
+      const query = 'SELECT cor, COUNT(*) as total FROM apostas GROUP BY cor ORDER BY total ASC LIMIT 1';
       const resultado = await pool.query(query);
-  
-      res.json(resultado.rows[0]);
+      
+      if (resultado.rows.length > 0) {
+        const vencedor = resultado.rows[0].cor;
+        res.json({ perdedor: vencedor });
+      } else {
+        res.json({ perdedor: 'Nenhum vencedor encontrado' });
+      }
     } catch (error) {
-      console.error('Erro ao obter o menor número de apostas:', error);
+      console.error('Erro ao verificar o vencedor:', error);
       res.status(500).json({ mensagem: 'Erro interno do servidor' });
     }
   });
+  
   
 
 app.listen(PORT, () => {
